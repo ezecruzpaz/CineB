@@ -7,15 +7,16 @@ body {
 
 .title {
   color: #f9ca24; /* Rojo oscuro */
-  font-size: 50px;
+  font-size: 30px;
   font-weight: 900;
 }
-
-form {
-  background-color: #fff; /* Fondo blanco */
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+.header {
+  background-color: #fff;
+  box-shadow: 1px 1px 4px 0 rgba(0, 0, 0, 0.1);
+  position: fixed;
+  width: 100%;
+  z-index: 3;
+  top: 0;
 }
 
 .custom_table {
@@ -58,7 +59,7 @@ form {
 
 #nuevoUsuarioForm {
   background-color: #333; /* Fondo gris oscuro */
-  color: #fff; /* Texto blanco */
+  color: #000000; /* Texto blanco */
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
@@ -135,6 +136,7 @@ form {
 
 #tablaUsuarios .btn-success,
 #tablaUsuarios .btn-danger {
-  width: 50px;
-  margin: 0 5px;
+  width: 80px;
+  margin: 0;
+  
 }

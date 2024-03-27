@@ -2,7 +2,12 @@ import express from "express";
 import cors from "cors";
 import session from "express-session";
 import router from "./src/router.js";
+
+
+
+import peliculasRouter from "./src/peliculasRouter.js"; // Importa el enrutador de películas
 import { generateRandomString } from './secret.js';// Importa la función
+
 
 const app = express();
 
@@ -27,20 +32,20 @@ app.set("views", "./views");
 
 // Carga la página de inicio
 app.get("/", (req, res) => {
-  res.render("inicio", {});
+  res.render("index", {});
 });
 
-// Usa el enrutador para las rutas relacionadas con estudiantes
+// Usa el enrutador para las rutas relacionadas con usuarios
 app.use("/", router);
-// app.js
 
+// Usa el enrutador para las rutas relacionadas con películas
+app.use("/", peliculasRouter);
 
 // Ruta para la página de lista de películas
 app.get("/lista-Peliculas", (req, res) => {
   // Aquí puedes renderizar tu vista de lista de películas o realizar otras acciones necesarias
   res.send("Página de lista de películas"); // Solo como ejemplo, debes ajustar esto según tu aplicación
 });
-
 
 const PORT = process.env.PORT || 3600;
 app.listen(PORT, () => {

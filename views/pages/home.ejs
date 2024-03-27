@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../includes/head') %>
+        <style>
+            #nuevoUsuarioForm {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: white;
+                padding: 20px;
+                z-index: 1000;
+            }
+
+            #cerrarPopupBtn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                cursor: pointer;
+            }
+
+            /* Tu estilo aquí */
+        </style>
+        <style>
+            /* Estilos específicos para la página de bienvenida */
+            .welcome-container {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              background-color: #fafafa; /* Fondo blanco */
+            }
+        
+            .welcome-card {
+              display: flex;
+              max-width: 800px;
+              background-color: #fff; /* Fondo blanco */
+              border-radius: 10px;
+              box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+              overflow: hidden;
+            }
+        
+            .welcome-card img {
+              width: 50%; /* Tamaño de la imagen */
+              object-fit: cover; /* Ajuste de imagen para cubrir el contenedor */
+              border-radius: 10px 0 0 10px; /* Borde redondeado en el lado izquierdo */
+            }
+        
+            .welcome-card-content {
+              padding: 20px;
+            }
+        
+            .welcome-card h2 {
+              color: #333; /* Texto oscuro */
+              margin-bottom: 10px;
+            }
+        
+            .welcome-card p {
+              color: #666; /* Texto gris */
+            }
+          </style>
+</head>
+
+<header class="header">
+    <input class="menu-btn" type="checkbox" id="menu-btn" />
+    <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>
+    <ul class="menu">
+        <li>
+            <a class="menu-item" href="/Crud-Completo-con-NodeJS-Express-y-MySQL">Inicio</a>
+        </li>
+        <li>
+            <a class="menu-item" href="/salas-admin">Salas</a>
+        </li>
+        <li>
+            <a class="menu-item" href="/Crud-usuarios">Lista Usuarios</a>
+        </li>
+        <li>
+            <a href="/lista-Peliculas">Peliculas</a>
+        </li>
+      </ul>
+      <ul>
+        
+    </ul>
+   <ul>
+        <li class="menu-item-right">
+            <a class="menu-item" href="/">Cerrar sesión</a>
+        </li>
+    </ul>
+</header>
+
+<body>
+    <div class="welcome-container">
+        <div class="welcome-card">
+          <!-- Imagen en el lado izquierdo del card -->
+          <img src="public/imgs/cine2.avif" alt="Imagen de bienvenida">
+    
+          <!-- Contenido de texto en el lado derecho del card -->
+          <div class="welcome-card-content">
+            <h2>Bienvenido al Sistema de Ventas de Cine Animado</h2>
+            <p>¡Descubre la magia del cine animado con nosotros! Prepárate para vivir emocionantes aventuras, reír a carcajadas y emocionarte con nuestros increíbles estrenos.</p>
+            <p>Explora nuestra selección de películas animadas, desde clásicos atemporales hasta las últimas creaciones de animación digital. ¡No te pierdas nuestras ofertas especiales y promociones exclusivas!</p>
+           </div>
+        </div>
+      </div>
+</body>
+
+</html>
+
+ <!-- Agrega los scripts al final del cuerpo del documento -->
+ <script>
+    // Variables para controlar la paginación
+    var currentPage = 1;
+    var usersPerPage = 5;
+    var usuarios = JSON.parse('<%- JSON.stringify(usuarios) %>'); // Obtén los usuarios de tu backend
+
+    // Función para mostrar los usuarios en la tabla según la página actual
+    function mostrarUsuarios() {
+        var startIndex = (currentPage - 1) * usersPerPage;
+        var endIndex = startIndex + usersPerPage;
+        var totalUsuarios = usuarios.length;
+
+        // Oculta todas las filas de usuarios
+        var filasUsuarios = document.querySelectorAll('.filaUsuario');
+        filasUsuarios.forEach(function(fila) {
+            fila.style.display = 'none';
+        });
+
+        // Muestra las filas correspondientes a la página actual
+        for (var j = startIndex; j < endIndex && j < totalUsuarios; j++) {
+            filasUsuarios[j].style.display = '';
+        }
+    }
+
+    // Función para manejar el clic en el botón de página anterior
+    document.getElementById('paginacionAnterior').addEventListener('click', function(event) {
+        event.preventDefault();
+        if (currentPage > 1) {
+            currentPage--;
+            mostrarUsuarios();
+        }
+    });
+
+    // Función para manejar el clic en el botón de página siguiente
+    document.getElementById('paginacionSiguiente').addEventListener('click', function(event) {
+        event.preventDefault();
+        var totalPages = Math.ceil(usuarios.length / usersPerPage);
+        if (currentPage < totalPages) {
+            currentPage++;
+            mostrarUsuarios();
+        }
+    });
+
+    // Mostrar usuarios cuando se carga la página
+    window.addEventListener('load', function() {
+        mostrarUsuarios();
+    });
+</script>
+<!-- Agrega los enlaces a tus scripts de SweetAlert y otros aquí -->
+    <script>
+        function validarNuevoUsuario() {
+            // Validaciones del nuevo usuario
+            var contrasena = document.getElementById('contrasena').value;
+            var confirmarContrasena = document.getElementById('confirmarContrasena').value;
+            var tipoUsuarioSelect = document.getElementById('tipoUsuarioSelect').value;
+            var estadoUsuarioSelect = document.getElementById('estadoUsuarioSelect').value;
+
+            if (contrasena !== confirmarContrasena) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Las contraseñas no coinciden',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                return false; // Evita que el formulario se envíe
+            }
+
+            if (!tipoUsuarioSelect || !estadoUsuarioSelect) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Por favor, selecciona un tipo de usuario y un estado',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                return false; // Evita que el formulario se envíe
+            }
+
+            return true; // Envía el formulario si todas las validaciones son exitosas
+        }
+
+    </script>
+    <!-- Agrega este enlace al SweetAlert CDN en tu <head> -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmarEliminarUsuario(idUsuario, tipoUsuario) {
+            if (tipoUsuario === 'super admin') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No se puede eliminar',
+                    text: 'Los super admin no pueden ser eliminados.',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            } else {
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: 'Esta acción no se puede deshacer.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminarlo'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Realiza la eliminación solo después de la confirmación
+                        var form = document.getElementById(`formEliminarUsuario${idUsuario}`);
+                        form.submit();
+                    }
+                });
+            }
+        }
+    </script>
+    
+    <script>
+        function togglePopup() {
+            var nuevoUsuarioForm = document.getElementById('nuevoUsuarioForm');
+            nuevoUsuarioForm.style.display = (nuevoUsuarioForm.style.display === 'none' || nuevoUsuarioForm.style.display === '') ? 'block' : 'none';
+        }
+    
+        function cerrarPopup() {
+            document.getElementById('nuevoUsuarioForm').style.display = 'none';
+        }
+    
+        function confirmarEliminarUsuario(idUsuario, tipoUsuario) {
+            if (tipoUsuario === 'super admin') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No se puede eliminar',
+                    text: 'Los super admin no pueden ser eliminados.',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            } else {
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: 'Esta acción no se puede deshacer.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminarlo'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Realiza la eliminación solo después de la confirmación
+                        var form = document.getElementById(`formEliminarUsuario${idUsuario}`);
+                        form.submit();
+                    }
+                });
+            }
+        }
+    
+        function validarNuevoUsuario() {
+            // Validaciones del nuevo usuario
+            var contrasena = document.getElementById('contrasena').value;
+            var confirmarContrasena = document.getElementById('confirmarContrasena').value;
+    
+            if (contrasena !== confirmarContrasena) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Las contraseñas no coinciden',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                return false; // Evita que el formulario se envíe
+            }
+        }
+    
+        function filtrarUsuarios() {
+            var tipoUsuario = document.getElementById('tipoUsuario').value.toLowerCase();
+            var estadoUsuario = document.getElementById('estadoUsuario').value.toLowerCase();
+            var busquedaUsuario = document.getElementById('busquedaUsuario').value.trim().toLowerCase();
+            var regex = /^[A-Za-z]+$/;
+    
+            // Validar que se haya ingresado un nombre de usuario
+            if (busquedaUsuario === '') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Ingrese un usuario',
+                    text: 'Por favor, ingrese el nombre de usuario que desea buscar.'
+                });
+                return;
+            }
+    
+            if (!regex.test(busquedaUsuario)) {
+                // Mostrar SweetAlert para el mensaje de error
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ingrese solo letras en el campo de búsqueda.'
+                });
+    
+                // Limpiar el campo de búsqueda
+                busquedaUsuarioInput.value = '';
+    
+                return;
+            }
+    
+            var tabla = document.getElementById('tablaUsuarios');
+            var filas = tabla.getElementsByTagName('tr');
+    
+            var usuariosEncontrados = false;
+    
+            for (var i = 1; i < filas.length; i++) {
+                var mostrarFila = true;
+    
+                var nombreUsuario = filas[i].getElementsByClassName('nombreUsuario')[0].textContent.trim().toLowerCase();
+                var tipoUsuarioFila = filas[i].getElementsByClassName('tipoUsuario')[0].textContent.trim().toLowerCase();
+                var estadoUsuarioFila = filas[i].getElementsByClassName('estadoUsuario')[0].textContent.trim().toLowerCase();
+    
+                if (tipoUsuario && tipoUsuarioFila !== tipoUsuario) {
+                    mostrarFila = false;
+                }
+    
+                if (estadoUsuario && estadoUsuarioFila !== estadoUsuario) {
+                    mostrarFila = false;
+                }
+    
+                if (busquedaUsuario && nombreUsuario.indexOf(busquedaUsuario) === -1) {
+                    mostrarFila = false;
+                }
+    
+                filas[i].style.display = mostrarFila ? '' : 'none';
+    
+                if (mostrarFila) {
+                    usuariosEncontrados = true;
+                }
+            }
+    
+            // Mostrar mensaje si no se encontraron usuarios usando SweetAlert
+            if (!usuariosEncontrados) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Usuario no encontrado',
+                    text: 'No se encontraron usuarios que coincidan con la búsqueda.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    // Recargar la página después de 1.5 segundos
+                    setTimeout(() => {
+                        location.reload();
+                    }, 450);
+                });
+            }
+        }
+    </script>
+    
+    
+    <script>
+        // Variables para controlar la paginación
+        var currentPage = 1;
+        var usersPerPage = 4;
+        var usuarios = JSON.parse('<%- JSON.stringify(usuarios) %>'); // Obtén los usuarios de tu backend
+    
+        // Función para mostrar los usuarios en la tabla según la página actual
+        function mostrarUsuarios() {
+            var startIndex = (currentPage - 1) * usersPerPage;
+            var endIndex = Math.min(startIndex + usersPerPage, usuarios.length);
+            var totalUsuarios = usuarios.length;
+    
+            // Oculta todas las filas de usuarios
+            var filasUsuarios = document.querySelectorAll('.filaUsuario');
+            filasUsuarios.forEach(function(fila) {
+                fila.style.display = 'none';
+            });
+    
+            // Muestra las filas correspondientes a la página actual
+            for (var j = startIndex; j < endIndex; j++) {
+                filasUsuarios[j].style.display = '';
+            }
+        }
+    
+        // Función para manejar el clic en el botón de página anterior
+        document.getElementById('paginacionAnterior').addEventListener('click', function(event) {
+            event.preventDefault();
+            if (currentPage > 1) {
+                currentPage--;
+                mostrarUsuarios();
+            }
+        });
+    
+        // Función para manejar el clic en el botón de página siguiente
+        document.getElementById('paginacionSiguiente').addEventListener('click', function(event) {
+            event.preventDefault();
+            var totalPages = Math.ceil(usuarios.length / usersPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                mostrarUsuarios();
+            }
+        });
+    
+        // Mostrar usuarios cuando se carga la página
+        window.addEventListener('load', function() {
+            mostrarUsuarios();
+        });
+    </script>
+    
+    
+
+    </div>
+</body>
+</html>
+<style>
+    /* Estilos generales del formulario */
+    form {
+        padding: 15px;
+    }
+  </style>

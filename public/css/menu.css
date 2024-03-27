@@ -13,6 +13,9 @@ a {
   width: 100%;
   z-index: 3;
   top: 0;
+  display: flex;
+  justify-content: space-between; /* Alinea los elementos a los extremos */
+  align-items: center;
 }
 
 .header ul {
@@ -21,6 +24,10 @@ a {
   list-style: none;
   overflow: hidden;
   background-color: #fff;
+}
+
+.header li {
+  float: left; /* Alinea los elementos del menú a la izquierda */
 }
 
 .header li a {
@@ -35,11 +42,10 @@ a {
 }
 
 .header .logo {
-  display: block;
-  float: left;
   font-size: 2em;
   padding: 5px 30px;
   text-decoration: none;
+  display: inline-block; /* Para que el logo no ocupe todo el ancho */
 }
 .logo img {
   width: 50px;
@@ -48,17 +54,14 @@ a {
 /* menu */
 
 .header .menu {
-  clear: both;
-  max-height: 0;
-  transition: max-height 0.2s ease-out;
+  display: flex;
+  align-items: center;
 }
 
 /* menu icon */
 
 .header .menu-icon {
   cursor: pointer;
-  display: inline-block;
-  float: right;
   padding: 28px 20px;
   position: relative;
   user-select: none;
@@ -122,15 +125,10 @@ a {
 /* 48em = 768px */
 
 @media (min-width: 48em) {
-  .header li {
-    float: left;
-  }
   .header li a {
     padding: 20px 30px;
   }
   .header .menu {
-    clear: none;
-    float: right;
     max-height: none;
   }
   .header .menu-icon {
@@ -140,4 +138,18 @@ a {
 
 .active {
   border-bottom: 3px solid #3f8a3b !important;
+}
+
+/* Estilos adicionales */
+
+.menu-item-left {
+  margin-right: auto;
+}
+
+.menu-item-center {
+  margin: 0 auto;
+}
+
+.menu-item-right {
+  margin-left: auto;
 }
