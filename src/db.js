@@ -1,4 +1,4 @@
-/*import mysql from "mysql2/promise";
+import mysql from "mysql2/promise";
 
 const pool = mysql.createPool({
   host: "162.241.60.214", // Cambia esto por la dirección IP o nombre de host del servidor MySQL en cPanel
@@ -11,8 +11,8 @@ const pool = mysql.createPool({
 });
 
 export default pool;
-*/
-import mysql from "mysql2/promise";
+
+/*import mysql from "mysql2/promise";
 
 const pool = mysql.createPool({
   host: "localhost", // Cambiar a la dirección IP o nombre de host de tu servidor MySQL local
@@ -24,4 +24,4 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
-export default pool;
+export default pool;*/
