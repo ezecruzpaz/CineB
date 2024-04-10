@@ -217,3 +217,42 @@ function filtrarUsuarios() {
 }
 
 
+export const listarSalas = async () => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM sala");
+    return rows;
+  } catch (error) {
+    console.error("Error al obtener las salas:", error);
+    throw { status: 500, message: "Error interno del servidor al obtener las salas" };
+  }
+};
+
+// Obtener todos los horarios de inicio de una sala específica
+export const listarHorarios = async (nombresala) => {
+  try {
+      const [rows] = await pool.query("SELECT idhorario, horarioinicio FROM horario WHERE idsala IN (SELECT idsala FROM sala WHERE nombresala = ?)", [nombresala]);
+      return rows;
+  } catch (error) {
+      console.error("Error al obtener los horarios de inicio:", error);
+      throw { status: 500, message: "Error interno del servidor al obtener los horarios de inicio" };
+  }
+};
+
+export const obtenerDetallesPelicula = async (id) => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT * FROM Peliculas WHERE id_pelicula = ?",
+      [id]
+    );
+
+    if (rows.length === 1) {
+      const pelicula = rows[0];
+      return pelicula;
+    } else {
+      throw { status: 404, message: "Película no encontrada" };
+    }
+  } catch (error) {
+    console.error(error);
+    throw { status: 500, message: "Error al obtener detalles de la película" };
+  }
+};

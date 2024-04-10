@@ -11,8 +11,8 @@ const pool = mysql.createPool({
 });
 
 export default pool;
-
-/*import mysql from "mysql2/promise";
+/*
+import mysql from "mysql2/promise";
 
 const pool = mysql.createPool({
   host: "localhost", // Cambiar a la dirección IP o nombre de host de tu servidor MySQL local

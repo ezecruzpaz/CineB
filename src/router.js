@@ -6,7 +6,7 @@ import {
   actualizarUsuario,
   obtenerDetallesUsuario,
   obtenerDetallesUsuarioUpdate,
-  autenticarUsuario // Importa la función de autenticación
+  autenticarUsuario ,obtenerDetallesPelicula
 } from "./usuarioController.js";
 
 const router = express.Router();
@@ -129,15 +129,20 @@ router.get('/lista-usuarios', (req, res) => {
   // Aquí renderiza la vista de la lista de usuarios o realiza cualquier otra acción necesaria
   res.render('pages/hometaquillero', {});
 });
-router.get('/lista-salas', (req, res) => {
+router.get ("/salas-admin",async (req, res) => {
   // Aquí renderiza la vista de la lista de usuarios o realiza cualquier otra acción necesaria
-  res.render('pages/For_Usuarios', {});
+  try {
+    const salas = await listarSalasta();
+    res.render("pages/For_Usuarios", { salas });
+  } catch (error) {
+    const { status, message } = error;
+    res.status(status || 500).json({ error: message });
+  }
 });
 
-router.get('/salas-admin', (req, res) => {
-  // Aquí renderiza la vista de la lista de usuarios o realiza cualquier otra acción necesaria
-  res.render('pages/salasadmin', {});
-});
+// Utiliza la función listarSalas aquí
+
+
 
 
 
@@ -216,6 +221,8 @@ router.post("/inicio", async (req, res) => {
 
 
 //Peliculas
+
+
 import multer from 'multer';
 import { fileURLToPath } from 'url';
 import path from 'path'; 
@@ -248,31 +255,20 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-// Resto del código...
-
-
-
 // Ruta para agregar una nueva película
 router.post("/peliculas", upload.single('imagen'), async (req, res) => {
   const { nombre_pelicula, sinopsis, duracion, genero, estado, precio } = req.body;
-  const imagen = req.file.filename; // Obtén el nombre del archivo del campo 'imagen'
+  const imagen = req.file.filename; 
 
   try {
     await agregarPelicula({ nombre_pelicula, sinopsis, duracion, genero, estado, imagen, precio });
-    res.redirect("/lista-Peliculas"); // Redirige a la página de lista de películas después de agregar una nueva película
+    res.redirect("/lista-Peliculas");
   } catch (error) {
     const { status, message } = error;
     res.status(status || 500).json({ error: message });
   }
 });
 
-
-// Resto del código del router...
-router.get('/actualizar-pelicula', (req, res) => {
-  res.render('pages/update_pelicula', {});
-});
-
-// Ruta para mostrar formulario de actualización de película
 router.get("/formulario-actualizar-pelicula/:id", async (req, res) => {
   const peliculaId = req.params.id;
 
@@ -285,14 +281,87 @@ router.get("/formulario-actualizar-pelicula/:id", async (req, res) => {
   }
 });
 
-// Ruta para actualizar una película por ID
-router.post("/actualizar-pelicula/:id", async (req, res) => {
-  const { nombre_pelicula, sinopsis, duracion, genero, estado, imagen, precio } = req.body;
-  const id = req.params.id;
 
+
+
+//Salas
+
+// Importa la función para listar las salas
+import { listarSalas,listarHorarios } from "./usuarioController.js";
+
+
+
+// Ruta para listar todas las salas
+
+router.get("/salas", async (req, res) => {
   try {
-    await actualizarPelicula(id, { nombre_pelicula, sinopsis, duracion, genero, estado, imagen, precio });
-    res.redirect("/lista-Peliculas");
+    const salas = await listarSalas();
+    const primeraSala = salas[0]; // Puedes cambiar esto según tu lógica
+
+    // Obtener los horarios de inicio de la primera sala por defecto
+    const horarios = await listarHorarios(primeraSala.nombresala);
+
+
+    // Obtener la lista de películas para el dropdownlist
+    const peliculas = await listarPeliculas();
+
+    res.render("pages/salasadmin", { salas, horarios, peliculas }); // Pasa las salas, horarios y películas a la vista
+  } catch (error) {
+    const { status, message } = error;
+    res.status(status || 500).json({ error: message });
+  }
+});
+
+router.get("/salas/:nombresala", async (req, res) => {
+  const nombresala = req.params.nombresala;
+  try {
+    const horarios = await listarHorarios(nombresala); // Obtener los horarios de inicio de la sala seleccionada
+
+    // Obtener la lista de salas para el dropdownlist
+    const salas = await listarSalas();
+
+    // Obtener la lista de películas para el dropdownlist
+    const peliculas = await listarPeliculas();
+
+    res.render("pages/salasadmin", { salas, horarios, peliculas }); // Pasa las salas, horarios y películas a la vista
+  } catch (error) {
+    const { status, message } = error;
+    res.status(status || 500).json({ error: message });
+  }
+});
+
+router.get('/lista-salas', async(req, res) => {
+  // Aquí renderiza la vista de la lista de usuarios o realiza cualquier otra acción necesaria
+  try {
+    const salas = await listarSalas();
+    const primeraSala = salas[0]; // Puedes cambiar esto según tu lógica
+
+    // Obtener los horarios de inicio de la primera sala por defecto
+    const horarios = await listarHorarios(primeraSala.nombresala);
+
+
+    // Obtener la lista de películas para el dropdownlist
+    const peliculas = await listarPeliculas();
+
+    res.render('pages/For_Usuarios',  { salas, horarios, peliculas }); // Pasa las salas, horarios y películas a la vista
+  } catch (error) {
+    const { status, message } = error;
+    res.status(status || 500).json({ error: message });
+  }
+});
+
+router.get("/lista-salas/:nombresala", async (req, res) => {
+  const nombresala = req.params.nombresala;
+  try {
+    const horarios = await listarHorarios(nombresala); // Obtener los horarios de inicio de la sala seleccionada
+
+    // Obtener la lista de salas para el dropdownlist
+    const salas = await listarSalas();
+
+    // Obtener la lista de películas para el dropdownlist
+    const peliculas = await listarPeliculas();
+
+    res.render('pages/For_Usuarios',  { salas, horarios, peliculas }); // Pasa las salas, horarios y películas a la vista
   } catch (error) {
     const { status, message } = error;
     res.status(status || 500).json({ error: message });
@@ -301,11 +370,9 @@ router.post("/actualizar-pelicula/:id", async (req, res) => {
 
 
 
+// Ruta para obtener los ticket  
+import ticketRouter from "./ticketRouter.js"; // Importa el enrutador de tickets
 
-
-
-
-
-
+router.use("/tickets", ticketRouter);
 
 export default router;

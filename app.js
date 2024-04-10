@@ -2,12 +2,9 @@ import express from "express";
 import cors from "cors";
 import session from "express-session";
 import router from "./src/router.js";
-
-
-
 import peliculasRouter from "./src/peliculasRouter.js"; // Importa el enrutador de películas
-import { generateRandomString } from './secret.js';// Importa la función
-
+import ticketsRouter from "./src/ticketRouter.js"; // Importa el enrutador de tickets
+import { generateRandomString } from './secret.js'; // Importa la función
 
 const app = express();
 
@@ -26,7 +23,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/public", express.static("public"));
 
-//Establece el motor de plantillas
+// Establece el motor de plantillas
 app.set("view engine", "ejs");
 app.set("views", "./views");
 
@@ -40,6 +37,9 @@ app.use("/", router);
 
 // Usa el enrutador para las rutas relacionadas con películas
 app.use("/", peliculasRouter);
+
+// Usa el enrutador para las rutas relacionadas con tickets
+app.use("/", ticketsRouter);
 
 // Ruta para la página de lista de películas
 app.get("/lista-Peliculas", (req, res) => {

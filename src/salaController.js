@@ -1,17 +1,29 @@
 // salaController.js
 
-import db from './db.js';
+import pool from "./db.js";
 
-export const agregarSala = async (req, res) => {
-    try {
-        const { nombreSala, sinopsisSala, duracionSala, generoSala, imagenSala, precioSala } = req.body;
-        const query = 'INSERT INTO Salas (nombre_sala, pelicula, horario) VALUES (?, ?, ?)';
-        await db.query(query, [nombreSala, sinopsisSala, duracionSala, generoSala, imagenSala, precioSala]);
-
-        // Redirigir solo después de agregar la sala correctamente
-        res.redirect('/lista-Peliculas');
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error interno del servidor');
-    }
+// Obtener todas las salas
+export const listarSalas = async () => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM sala");
+    return rows;
+  } catch (error) {
+    console.error("Error al obtener las salas:", error);
+    throw { status: 500, message: "Error interno del servidor al obtener las salas" };
+  }
 };
+
+// Obtener todos los horarios de inicio de una sala específica
+export const listarHorarios = async (nombresala) => {
+  try {
+      const [rows] = await pool.query("SELECT idhorario, horarioinicio FROM horario WHERE idsala IN (SELECT idsala FROM sala WHERE nombresala = ?)", [nombresala]);
+      return rows;
+  } catch (error) {
+      console.error("Error al obtener los horarios de inicio:", error);
+      throw { status: 500, message: "Error interno del servidor al obtener los horarios de inicio" };
+  }
+};
+
+
+// Exporta la función para que esté disponible en otros archivos
+

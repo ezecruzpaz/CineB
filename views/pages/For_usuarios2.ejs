@@ -6,238 +6,226 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Películas</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <%- include('../includes/head') %>
 
-        <style>
-            #nuevaPeliculaForm {
-                display: none;
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background-color: white;
-                padding: 20px;
-                z-index: 1000;
-                width: 80%;
-                max-width: 400px;
-            }
+    <style>
+        #nuevaPeliculaForm {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            z-index: 1000;
+            width: 80%;
+            max-width: 400px;
+        }
 
-            #cerrarPopupBtn {
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                cursor: pointer;
-            }
+        #cerrarPopupBtn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
 
+        .scrollable-form {
+            max-height: 600px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
 
+        .table-responsive {
+            overflow-x: auto;
+        }
 
-            /* Estilos para reducir el tamaño de los labels */
-            label.form-label {
-                font-size: 0.8rem;
-                margin-bottom: 0.25rem;
-                /* Espacio inferior reducido */
-            }
-
-            /* Estilos para reducir el tamaño de los inputs */
-            input[type="text"].form-control,
-            select.form-select {
-                font-size: 0.8rem;
-                padding: 0.375rem 0.75rem;
-            }
-
-            /* Estilos para la tabla */
-            .custom-table {
-                margin-top: 10px;
-                margin-bottom: 10px;
-                margin:auto;
-                /* Añadido margen inferior */
-            }
-
-            /* Estilos para aumentar el tamaño del texto */
-            table {
-                font-size: 1rem;
-            }
-
-            /* Estilos para reducir el tamaño de los labels */
-            label.form-label {
-                font-size: 0.8rem;
-                margin-bottom: 0.25rem;
-                /* Espacio inferior reducido */
-            }
-        </style>
-
+        .table-custom {
+            min-width: 1500px;
+        }
+    </style>
 </head>
-<header class="header">
-    <input class="menu-btn" type="checkbox" id="menu-btn" />
-    <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>
-    <ul class="menu">
-        <li>
-            <a class="menu-item" href="/Crud-Completo-con-NodeJS-Express-y-MySQL">Inicio</a>
-        </li>
-        <li>
-            <a class="menu-item" href="/salas-admin">Salas</a>
-        </li>
-        <li>
-            <a class="menu-item" href="/Crud-usuarios">Lista Usuarios</a>
-        </li>
-        <li>
-            <a href="/lista-Peliculas">Peliculas</a>
-        </li>
-    </ul>
-    <ul>
 
-    </ul>
-    <ul>
-        <li class="menu-item-right">
-            <a class="menu-item" href="/">Cerrar sesión</a>
-        </li>
-    </ul>
-</header>
-<div class="container" style="margin-top: 80px !important">
-    <div class="row justify-content-center mb-5">
-        <div class="col-md-12 mt-2 text-center">
-            <h2 class="title">Peliculas</h2>
-            <div class="col-md-3">
-                <label class="invisible">Botón Formulario</label>
-                <a href="javascript:void(0);" class="btn btn-primary btn-block" onclick="togglePopup()">Añadir
-                    Película</a>
+<body>
+
+    <header class="header">
+        <input class="menu-btn" type="checkbox" id="menu-btn" />
+        <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>
+        <ul class="menu">
+            <li>
+                <a class="menu-item" href="/Crud-Completo-con-NodeJS-Express-y-MySQL">Inicio</a>
+            </li>
+            <li>
+                <a class="menu-item" href="/salas">Salas</a>
+            </li>
+            <li>
+                <a class="menu-item" href="/Crud-usuarios">Lista Usuarios</a>
+            </li>
+            <li>
+                <a href="/lista-Peliculas">Peliculas</a>
+            </li>
+        </ul>
+        <ul>
+
+        </ul>
+        <ul>
+            <li class="menu-item-right">
+                <a class="menu-item" href="/">Cerrar sesión</a>
+            </li>
+        </ul>
+    </header>
+    <div class="container" style="margin-top: 80px !important">
+        <div class="row justify-content-center mb-5">
+            <div class="col-md-12 mt-2 text-center">
+                <h2 class="title">Peliculas</h2>
+                <div class="col-md-3">
+                    <label class="invisible">Botón Formulario</label>
+                    <a href="javascript:void(0);" class="btn btn-primary btn-block" onclick="togglePopup()">Añadir
+                        Película</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
-<div id="nuevaPeliculaForm" class="col-md-5 py-3 custom_table mx-auto">
-    <form id="formNuevaPelicula" action="/peliculas" method="POST" onsubmit="return validarNuevaPelicula()" enctype="multipart/form-data">
-        <h2 class="text-center title">Agregar Película</h2>
-        <!-- Campos del formulario -->
-        <div class="mb-3">
-            <label for="nombre_pelicula" class="form-label">Nombre Pelicula</label>
-            <input type="text" name="nombre_pelicula" id="nombrepelicula" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label for="sinopsis" class="form-label">Sinopsis</label>
-            <input type="text" name="sinopsis" id="sinopsis" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label for="duracion" class="form-label">Duración</label>
-            <input type="text" name="duracion" id="duracion" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label for="genero" class="form-label">Género</label>
-            <select class="form-select" name="genero" id="genero" required>
-                <option value="">Seleccionar Género</option>
-                <option value="Acción">Acción</option>
-                <option value="Comedia">Comedia</option>
-                <option value="Drama">Drama</option>
-                <!-- Agrega más opciones según sea necesario -->
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="estado" class="form-label">Estado de Película</label>
-            <select class="form-select" name="estado" id="estado" required>
-                <option value="">Seleccionar Estado de Película</option>
-                <option value="Activa">Activa</option>
-                <option value="Inactiva">Inactiva</option>
-                <!-- Agrega más opciones según sea necesario -->
-            </select>
-        </div>
+    <div id="nuevaPeliculaForm" class="col-md-5 py-3 custom_table mx-auto">
+        <div class="scrollable-form">
+            <form id="formNuevaPelicula" action="/peliculas" method="POST" onsubmit="return validarNuevaPelicula()"
+                enctype="multipart/form-data">
+                <h2 class="text-center title">Agregar Película</h2>
+                <!-- Campos del formulario -->
+                <div class="mb-3">
+                    <label for="nombre_pelicula" class="form-label">Nombre Pelicula</label>
+                    <input type="text" name="nombre_pelicula" id="nombrepelicula" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="sinopsis" class="form-label">Sinopsis</label>
+                    <input type="text" name="sinopsis" id="sinopsis" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="duracion" class="form-label">Duración</label>
+                    <input type="text" name="duracion" id="duracion" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="genero" class="form-label">Género</label>
+                    <select class="form-select" name="genero" id="genero" required>
+                        <option value="">Seleccionar Género</option>
+                        <option value="Acción">Acción</option>
+                        <option value="Comedia">Comedia</option>
+                        <option value="Drama">Drama</option>
+                        <!-- Agrega más opciones según sea necesario -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="estado" class="form-label">Estado de Película</label>
+                    <select class="form-select" name="estado" id="estado" required>
+                        <option value="">Seleccionar Estado de Película</option>
+                        <option value="Activa">Activa</option>
+                        <option value="Inactiva">Inactiva</option>
+                        <!-- Agrega más opciones según sea necesario -->
+                    </select>
+                </div>
 
-        <div class="mb-3">
-            <label for="imagen" class="form-label">Imagen</label>
-            <input type="file" name="imagen" id="imagen" class="form-control" required />
-          </div>
-        <div class="mb-3">
-            <label for="precio" class="form-label">Precio</label>
-            <input type="text" name="precio" id="precio" class="form-control" required />
+                <div class="mb-3">
+                    <label for="imagen" class="form-label">Imagen</label>
+                    <input type="file" name="imagen" id="imagen" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="precio" class="form-label">Precio</label>
+                    <input type="text" name="precio" id="precio" class="form-control" required />
+                </div>
+                <div class="row">
+                    <div class="d-grid gap-2 col-12 mx-auto ">
+                        <button class="btn btn-primary btn-block" type="submit">Agregar Película</button>
+                    </div>
+                    <div class="d-grid gap-2 col-12 mx-auto mt-4 mb-4">
+                        <button class="btn btn-danger btn-block" type="button" onclick="cerrarPopup()">Cancelar</button>
+                    </div>
+                </div>
+            </form>
         </div>
-        <div class="row">
-            <div class="col-6">
-                <button class="btn btn-primary btn-block" type="submit">Agregar Película</button>
+    </div>
+    <div id="mensajeNoEncontrado" class="alert alert-warning mt-3" style="display: none;">Película no encontrada.
+    </div>
+
+    <!-- Tabla para mostrar las películas -->
+    
+    <div class="col-md-8 py-3 m-5 custom_table mx-auto">
+        <form id="filterForm" class="mb-3">
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" placeholder="Buscar Película" id="busquedaPelicula">
+                <button class="btn btn-outline-secondary" type="button" onclick="buscarPelicula()">🔎</button>
             </div>
-            <div class="col-6">
-                <button class="btn btn-danger btn-block" type="button" onclick="cerrarPopup()">Cancelar</button>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="tipoPelicula">Tipo de Película</label>
+                    <select class="form-select" id="tipoPelicula">
+                        <option value="">Tipo</option>
+                        <option value="Acción">Acción</option>
+                        <option value="Comedia">Comedia</option>
+                        <option value="Drama">Drama</option>
+                        <!-- Agrega más opciones según sea necesario -->
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="estadoPelicula">Estado de Película</label>
+                    <select class="form-select" id="estadoPelicula">
+                        <option value="">Estado</option>
+                        <option value="Activa">Activa</option>
+                        <option value="Inactiva">Inactiva</option>
+                        <!-- Agrega más opciones según sea necesario -->
+                    </select>
+                </div>
             </div>
-        </div>
-    </form>
-</div>
+        </form>
 
-<div id="mensajeNoEncontrado" class="alert alert-warning mt-3" style="display: none;">Película no encontrada.</div>
-
-<!-- Tabla para mostrar las películas -->
-<div class="col-md-8 py-3 custom_table mx-auto">
-    <form id="filterForm" class="mb-3">
-        <div class="input-group mb-2">
-            <input type="text" class="form-control" placeholder="Buscar Película" id="busquedaPelicula">
-            <button class="btn btn-outline-secondary" type="button" onclick="buscarPelicula()">Buscar</button>
-        </div>
-
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label for="tipoPelicula">Tipo de Película</label>
-                <select class="form-select" id="tipoPelicula">
-                    <option value="">Tipo</option>
-                    <option value="Acción">Acción</option>
-                    <option value="Comedia">Comedia</option>
-                    <option value="Drama">Drama</option>
-                    <!-- Agrega más opciones según sea necesario -->
-                </select>
-            </div>
-            <div class="col-md-6">
-                <label for="estadoPelicula">Estado de Película</label>
-                <select class="form-select" id="estadoPelicula">
-                    <option value="">Estado</option>
-                    <option value="Activa">Activa</option>
-                    <option value="Inactiva">Inactiva</option>
-                    <!-- Agrega más opciones según sea necesario -->
-                </select>
-            </div>
-        </div>
-    </form>
-
-    <!-- Tabla de Películas -->
-    <div class="container">
-        <div class="table-responsive">
-            <table id="tablaPeliculas" class="table custom-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th class="text-center">Sinopsis</th>
-                        
-                        <th class="text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Aquí se deben mostrar las películas -->
-                    <% peliculas.forEach((pelicula, index) => { %>
-                    <tr>
-                        <td><%= index + 1 %></td>
-                        <td><%= pelicula.nombre_pelicula %></td>
-                        <td><%= pelicula.sinopsis %></td>
-                       <td>
-                        <span>
-                            <a href="/formulario-actualizar-pelicula/<%= pelicula.id_pelicula %>" class="btn btn-primary btn-sm">Editar</a>
-                        
-                            <form id="formEliminarPelicula" action="/borrar-pelicula/<%= pelicula.id_pelicula %>" method="POST" onsubmit="return confirmarEliminarPelicula()">
-                                <!-- Agregar campo oculto para enviar el método DELETE -->
-                                <input type="hidden" name="_method" value="DELETE" />
+        <!-- Tabla de Películas -->
+        <div class="container">
+            <div class="table-responsive">
+                <table id="tablaPeliculas" class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
                             
-                                <!-- Agregar el botón de tipo submit para enviar el formulario -->
-                                <button type="submit" class="btn btn-danger btn-sm">
-                                    Eliminar
-                                </button>
-                            </form>
-                        </span>
-                        
-                       </td>
-                    </tr>
-                    <% }); %>
-                </tbody>
-            </table>
-        </div>
-   
-
+                            <th>Nombre</th>
+                            <th class="text-center">Sinopsis</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se deben mostrar las películas -->
+                        <% peliculas.forEach((pelicula, index) => { %>
+                            <tr class="filaPelicula">
+                                <td><strong>
+                                    <%= index + 1 %>
+                                </strong></td>
+                                
+                                <td>
+                                    <%= pelicula.nombre_pelicula %>                                   
+                                </td>
+                                <td>
+                                    <%= pelicula.sinopsis %>...
+                                </td>
+                                <td>
+                                    <span>
+                                        <!-- Botón para editar la película -->
+                                        <a href="/formulario-actualizar-pelicula/<%= pelicula.id_pelicula %>" class="btn btn-success success_especial">Editar</a>
+                    
+                                        <!-- Botón para eliminar la película -->
+                                        <form id="formEliminarPelicula_<%= pelicula.id_pelicula %>" action="/borrar-pelicula/<%= pelicula.id_pelicula %>" method="POST">
+                                            <!-- Agregar campo oculto para enviar el método DELETE -->
+                                            <input type="hidden" name="_method" value="DELETE" />
+                                            <button type="button" class="btn btn-danger" onclick="confirmarEliminarPelicula('<%= pelicula.id_pelicula %>')">Eliminar</button>
+                                        </form>
+                                    </span>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                    
+                </table>
+            </div>
         </div>
         <div class="col-md-6 text-end">
             <!-- Alineado a la derecha -->
@@ -259,28 +247,143 @@
         </div>
     </div>
 
-</div>
+    <script>
+        function togglePopup() {
+            const popup = document.getElementById('nuevaPeliculaForm');
+            popup.style.display = (popup.style.display === 'none' || popup.style.display === '') ? 'block' : 'none';
+        }
+
+        function cerrarPopup() {
+            document.getElementById('nuevaPeliculaForm').style.display = 'none';
+        }
+
+        function validarNuevaPelicula() {
+            // Lógica de validación del formulario
+            return true; // Devuelve true si el formulario es válido, de lo contrario devuelve false
+        }
+
+        function buscarPelicula() {
+            const input = document.getElementById('busquedaPelicula').value;
+            const tipoPelicula = document.getElementById('tipoPelicula').value;
+            const estadoPelicula = document.getElementById('estadoPelicula').value;
+
+            // Lógica para filtrar películas según los criterios de búsqueda
+            const peliculasFiltradas = peliculas.filter(pelicula => {
+                return pelicula.nombre_pelicula.toLowerCase().includes(input.toLowerCase()) &&
+                    (tipoPelicula === '' || pelicula.genero === tipoPelicula) &&
+                    (estadoPelicula === '' || pelicula.estado === estadoPelicula);
+            });
+
+            if (peliculasFiltradas.length > 0) {
+                // Muestra las películas filtradas
+                mostrarPeliculasFiltradas(peliculasFiltradas);
+            } else {
+                // Muestra un mensaje de alerta si no se encuentran películas
+                mostrarAlertaNoEncontrado();
+            }
+        }
+
+        // Función para mostrar las películas filtradas en la tabla
+        function mostrarPeliculasFiltradas(peliculasFiltradas) {
+            const tablaPeliculas = document.getElementById('tablaPeliculas').getElementsByTagName('tbody')[0];
+            tablaPeliculas.innerHTML = ''; // Limpia la tabla
+
+            peliculasFiltradas.forEach((pelicula, index) => {
+                const fila = `
+                    <tr class="filaPelicula">
+                        <td><strong>${index + 1}</strong></td>
+                        <td><img src="${pelicula.imagen}" style="max-width: 100px; height: auto;"></td>
+                        <td>${pelicula.nombre_pelicula}</td>
+                        <td>${pelicula.sinopsis.substring(0, 20)}...</td>
+                        <td>
+                            <span>
+                                <a href="/formulario-actualizar-pelicula/${pelicula.id_pelicula}"
+                                    class="btn btn-success success_especial">Editar</a>
+                                <form id="formEliminarPelicula"
+                                    action="/borrar-pelicula/${pelicula.id_pelicula}" method="POST"
+                                    onsubmit="return confirmarEliminarPelicula()">
+                                    <input type="hidden" name="_method" value="DELETE" />
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                </form>
+                            </span>
+                        </td>
+                    </tr>`;
+                tablaPeliculas.innerHTML += fila;
+            });
+        }
+
+        // Función para mostrar un mensaje de alerta si no se encuentran películas
+        function mostrarAlertaNoEncontrado() {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No se encontraron películas',
+                text: 'Intente con otros criterios de búsqueda',
+            });
+        }
+
+        // Variables para controlar la paginación
+        var currentPage = 1;
+        var peliculasPerPage = 4; // Número de películas por página
+        var peliculas = JSON.parse('<%- JSON.stringify(peliculas) %>');
+
+        // Función para mostrar las películas en la tabla según la página actual
+        function mostrarPeliculas() {
+            var startIndex = (currentPage - 1) * peliculasPerPage;
+            var endIndex = startIndex + peliculasPerPage;
+            var totalPeliculas = peliculas.length;
+
+            // Oculta todas las filas de películas
+            var filasPeliculas = document.querySelectorAll('.filaPelicula');
+            filasPeliculas.forEach(function (fila) {
+                fila.style.display = 'none';
+            });
+
+            // Muestra las filas correspondientes a la página actual
+            for (var j = startIndex; j < endIndex && j < totalPeliculas; j++) {
+                filasPeliculas[j].style.display = '';
+            }
+        }
+        function confirmarEliminarPelicula(id_pelicula) {
+            Swal.fire({
+                title: '¿Estás seguro de eliminar esta película?',
+                text: 'Esta acción no se puede deshacer',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Si el usuario confirma, se envía el formulario para eliminar la película
+                    document.getElementById('formEliminarPelicula_' + id_pelicula).submit();
+                }
+            });
+        }
+        // Función para manejar el clic en el botón de página anterior
+        document.getElementById('paginacionAnterior').addEventListener('click', function (event) {
+            event.preventDefault();
+            if (currentPage > 1) {
+                currentPage--;
+                mostrarPeliculas();
+            }
+        });
+
+        // Función para manejar el clic en el botón de página siguiente
+        document.getElementById('paginacionSiguiente').addEventListener('click', function (event) {
+            event.preventDefault();
+            var totalPages = Math.ceil(peliculas.length / peliculasPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                mostrarPeliculas();
+            }
+        });
+
+        // Mostrar películas cuando se carga la página
+        window.addEventListener('load', function () {
+            mostrarPeliculas();
+        });
+    </script>
 </body>
 
 </html>
-
-<script>
-    function togglePopup() {
-        const popup = document.getElementById('nuevaPeliculaForm');
-        popup.style.display = (popup.style.display === 'none' || popup.style.display === '') ? 'block' : 'none';
-    }
-
-    function cerrarPopup() {
-        document.getElementById('nuevaPeliculaForm').style.display = 'none';
-    }
-
-    function validarNuevaPelicula() {
-        // Lógica de validación del formulario
-        return true; // Devuelve true si el formulario es válido, de lo contrario devuelve false
-    }
-
-    function buscarPelicula() {
-        const input = document.getElementById('busquedaPelicula').value;
-        // Lógica para buscar películas y actualizar la tabla
-    }
-</script>
